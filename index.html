@@ -3,110 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StyleSync Pro | المساعد الذكي</title>
+    <title>StyleSync | التحكم الكامل</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Montserrat', sans-serif; background: #f4f7f6; min-height: 100vh; color: #1a1a1a; }
-        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.4); }
-        .card-fashion { border-radius: 25px; transition: all 0.3s ease; background: white; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .section-anim { animation: fadeIn 0.4s ease-out; }
+        body { font-family: 'Montserrat', sans-serif; background: #fdfdfd; color: #1a1a1a; }
+        .nav-glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #eee; }
+        .fashion-card { border-radius: 20px; background: white; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); transition: 0.3s; position: relative; }
+        .section-fade { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Switch Design */
+        /* Custom UI Elements */
+        .delete-btn { background: rgba(239, 68, 68, 0.9); color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; position: absolute; top: 10px; left: 10px; z-index: 10; opacity: 1; transition: 0.2s; }
+        .delete-btn:hover { background: #dc2626; transform: scale(1.1); }
+        
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 24px; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e2e8f0; transition: .4s; border-radius: 24px; }
         .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #000; }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        /* Loader Spinner */
-        .spinner { width: 45px; height: 45px; border: 5px solid #f3f3f3; border-top: 5px solid #000; border-radius: 50%; animation: spin 1s linear infinite; }
+        .loading-spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #000; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .editable-item { border: 2px solid transparent; }
-        .editable-item:active { transform: scale(0.98); background: #fff; }
-        
-        /* Hide scrollbar */
-        #swap-grid::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="flex flex-col md:flex-row pb-20 md:pb-0">
+<body class="flex flex-col md:flex-row pb-24 md:pb-0 min-h-screen">
 
-    <nav class="fixed bottom-0 w-full glass border-t md:relative md:w-72 md:h-screen md:border-r md:border-t-0 z-[100] flex md:flex-col justify-around md:justify-start p-4 md:pt-12">
-        <div class="hidden md:block mb-10 px-6 text-right">
-            <h1 class="text-3xl font-black tracking-tighter uppercase leading-none">Style<br>Sync</h1>
-            <div class="h-1.5 w-10 bg-black mt-2"></div>
+    <nav class="fixed bottom-0 w-full nav-glass md:relative md:w-64 md:h-screen md:border-r md:border-t-0 z-[100] flex md:flex-col justify-around md:justify-start p-4 md:pt-12">
+        <div class="hidden md:block mb-10 px-6">
+            <h1 class="text-3xl font-black italic tracking-tighter">STYLE.</h1>
+            <div class="h-2 w-10 bg-black mt-2"></div>
         </div>
         <div class="flex md:flex-col w-full gap-2 md:gap-4">
-            <button onclick="showSection('planner')" class="flex-1 md:flex-none flex flex-col md:flex-row items-center p-4 rounded-2xl hover:bg-white transition font-bold"><span class="text-2xl">✨</span><span class="md:mr-3 text-xs md:text-base">المنظم</span></button>
-            <button onclick="showSection('closet')" class="flex-1 md:flex-none flex flex-col md:flex-row items-center p-4 rounded-2xl hover:bg-white transition font-bold"><span class="text-2xl">🧥</span><span class="md:mr-3 text-xs md:text-base">الدولاب</span></button>
-            <button onclick="showSection('history')" class="flex-1 md:flex-none flex flex-col md:flex-row items-center p-4 rounded-2xl hover:bg-white transition font-bold"><span class="text-2xl">⏳</span><span class="md:mr-3 text-xs md:text-base">السجل</span></button>
+            <button onclick="showSection('planner')" class="flex-1 md:flex-none flex flex-col md:flex-row items-center p-3 rounded-2xl hover:bg-gray-100 transition">
+                <span class="text-2xl md:ml-3">✨</span> <span class="text-[10px] md:text-base font-bold uppercase">المنظم</span>
+            </button>
+            <button onclick="showSection('closet')" class="flex-1 md:flex-none flex flex-col md:flex-row items-center p-3 rounded-2xl hover:bg-gray-100 transition">
+                <span class="text-2xl md:ml-3">🧥</span> <span class="text-[10px] md:text-base font-bold uppercase">الدولاب</span>
+            </button>
+            <button onclick="showSection('history')" class="flex-1 md:flex-none flex flex-col md:flex-row items-center p-3 rounded-2xl hover:bg-gray-100 transition">
+                <span class="text-2xl md:ml-3">🕒</span> <span class="text-[10px] md:text-base font-bold uppercase">السجل</span>
+            </button>
         </div>
     </nav>
 
-    <main class="flex-1 p-6 md:p-12 overflow-y-auto">
-        <section id="planner" class="section-anim max-w-xl mx-auto">
-            <div class="mb-8 text-right">
-                <h2 class="text-4xl font-black italic">EDITOR</h2>
-                <p class="text-gray-500 font-medium">اضغط على أي قطعة لتغييرها يدوياً</p>
+    <main class="flex-1 p-6 md:p-12">
+        
+        <section id="planner" class="section-fade max-w-xl mx-auto">
+            <div class="mb-10 text-right">
+                <h2 class="text-4xl font-black italic tracking-tight">LOOKBOOK</h2>
+                <p class="text-gray-400 font-medium">نسق طقمك واعتمد إطلالتك</p>
             </div>
+            
             <div id="outfit-display" class="grid gap-4">
-                <div class="py-20 glass rounded-[30px] border-dashed border-2 border-gray-200 text-center text-gray-400">ابدأ بتنسيق طقمك اليوم</div>
+                <div class="py-24 border-2 border-dashed border-gray-200 rounded-[40px] text-center text-gray-300 font-bold italic">لا يوجد طقم حالي</div>
             </div>
-            <div class="mt-8 flex flex-col gap-3">
-                <button onclick="generateOutfit()" class="w-full bg-black text-white py-5 rounded-[25px] font-black text-xl shadow-lg active:scale-95 transition-all">تنسيق طقم ✨</button>
-                <button id="confirm-btn" class="hidden w-full border-2 border-black py-5 rounded-[25px] font-black text-xl hover:bg-black hover:text-white transition-all" onclick="confirmOutfit()">اعتمدت اللبس ✅</button>
+
+            <div class="mt-8 flex flex-col gap-4">
+                <button onclick="generateOutfit()" class="w-full bg-black text-white py-6 rounded-3xl font-black text-xl shadow-2xl active:scale-95 transition-all">تنسيق تلقائي ✨</button>
+                <button id="confirm-btn" class="hidden w-full border-2 border-black py-6 rounded-3xl font-black text-xl hover:bg-black hover:text-white transition-all" onclick="confirmOutfit()">اعتمدت هذا اللبس ✅</button>
             </div>
         </section>
 
-        <section id="closet" class="section-anim hidden">
+        <section id="closet" class="section-fade hidden">
             <div class="flex justify-between items-end mb-10">
                 <h2 class="text-4xl font-black italic">CLOSET</h2>
-                <p id="item-count" class="text-gray-500 font-bold">0 قطع</p>
+                <div class="text-left"><span id="item-count" class="bg-black text-white px-4 py-1 rounded-full text-xs font-bold">0</span></div>
             </div>
-            <div id="closet-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-6 pb-32"></div>
-            <button onclick="openUploadModal()" class="fixed bottom-28 md:bottom-12 left-8 md:left-12 w-16 h-16 md:w-20 md:h-20 bg-black text-white rounded-full shadow-2xl flex items-center justify-center text-4xl z-[110] hover:scale-110 active:scale-90 transition-all">+</button>
+            
+            <div id="closet-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-6 pb-24"></div>
+            
+            <button onclick="openUploadModal()" class="fixed bottom-28 md:bottom-12 left-8 md:left-12 w-16 h-16 md:w-20 md:h-20 bg-black text-white rounded-full shadow-2xl flex items-center justify-center text-4xl active:scale-90 transition-all z-[110]">+</button>
         </section>
 
-        <section id="history" class="section-anim hidden">
+        <section id="history" class="section-fade hidden">
             <h2 class="text-4xl font-black italic mb-10">HISTORY</h2>
-            <div id="history-list" class="grid gap-3"></div>
+            <div id="history-list" class="grid gap-4 pb-20"></div>
         </section>
+
     </main>
 
     <div id="uploadModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-[200] flex items-center justify-center p-6">
-        <div class="bg-white rounded-[40px] p-8 max-w-md w-full text-center shadow-2xl">
+        <div class="bg-white rounded-[40px] p-8 max-w-sm w-full text-center">
             <div id="modal-content">
-                <h3 class="text-2xl font-black mb-6">إضافة ملابس جديدة</h3>
-                <div class="grid gap-3">
-                    <button onclick="triggerFile('Tops')" class="w-full py-4 rounded-2xl border-2 font-bold flex justify-between px-6 items-center hover:bg-gray-50"><span>👕 قِطع علوية</span><span>→</span></button>
-                    <button onclick="triggerFile('Bottoms')" class="w-full py-4 rounded-2xl border-2 font-bold flex justify-between px-6 items-center hover:bg-gray-50"><span>👖 قِطع سفلية</span><span>→</span></button>
-                    <button onclick="triggerFile('Shoes')" class="w-full py-4 rounded-2xl border-2 font-bold flex justify-between px-6 items-center hover:bg-gray-50"><span>👟 أحذية</span><span>→</span></button>
-                    <button onclick="closeUploadModal()" class="mt-4 text-red-500 font-bold">إلغاء</button>
+                <h3 class="text-2xl font-black mb-8 italic uppercase tracking-wider">إضافة ملابس</h3>
+                <div class="grid gap-4 text-right">
+                    <button onclick="triggerFile('Tops')" class="w-full py-5 border-2 rounded-2xl font-bold flex justify-between px-8 hover:bg-gray-50 transition"><span>👕 قِطع علوية</span><span>→</span></button>
+                    <button onclick="triggerFile('Bottoms')" class="w-full py-5 border-2 rounded-2xl font-bold flex justify-between px-8 hover:bg-gray-50 transition"><span>👖 قِطع سفلية</span><span>→</span></button>
+                    <button onclick="triggerFile('Shoes')" class="w-full py-5 border-2 rounded-2xl font-bold flex justify-between px-8 hover:bg-gray-50 transition"><span>👟 أحذية</span><span>→</span></button>
+                    <button onclick="closeUploadModal()" class="mt-4 text-gray-400 font-bold uppercase text-sm">إلغاء</button>
                 </div>
             </div>
             <div id="loader" class="hidden flex flex-col items-center py-10">
-                <div class="spinner mb-4"></div>
-                <p class="font-bold">جاري الرفع والضغط...</p>
-                <p class="text-xs text-gray-400 mt-2 italic">يرجى الانتظار، لا تغلق الصفحة</p>
+                <div class="loading-spinner mb-4"></div>
+                <p class="font-black italic">جاري الرفع...</p>
             </div>
             <input type="file" id="actualInput" class="hidden" accept="image/*" multiple>
         </div>
     </div>
 
     <div id="swapModal" class="fixed inset-0 bg-black/95 backdrop-blur-2xl hidden z-[300] flex flex-col p-6">
-        <div class="flex justify-between items-center mb-6 text-white">
-            <h3 class="text-2xl font-black italic" id="swap-title">بدائل متاحة</h3>
-            <button onclick="closeSwapModal()" class="text-4xl p-2">&times;</button>
+        <div class="flex justify-between items-center mb-8 text-white">
+            <h3 class="text-2xl font-black italic">اختر قطعة بديلة</h3>
+            <button onclick="closeSwapModal()" class="text-4xl">&times;</button>
         </div>
-        <div id="swap-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 overflow-y-auto pb-10"></div>
+        <div id="swap-grid" class="grid grid-cols-2 md:grid-cols-5 gap-4 overflow-y-auto"></div>
     </div>
 
     <script>
-        let closet = JSON.parse(localStorage.getItem('style_vFinal_closet')) || [];
-        let history = JSON.parse(localStorage.getItem('style_vFinal_history')) || [];
+        // مفاتيح تخزين فريدة لضمان عدم حدوث تداخل
+        const STORAGE_KEY = 'STYLESYNC_APP_CLOSET_V5';
+        const HISTORY_KEY = 'STYLESYNC_APP_HISTORY_V5';
+
+        let closet = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
         let tempCat = '';
         let currentOutfit = { Tops: null, Bottoms: null, Shoes: null };
 
@@ -117,7 +128,7 @@
             if(id === 'history') renderHistory();
         }
 
-        // --- Improved Upload Logic (Prevents Freezing) ---
+        // --- ميزات الرفع والضغط ---
         function openUploadModal() { 
             document.getElementById('modal-content').style.display = 'block';
             document.getElementById('loader').classList.add('hidden');
@@ -133,50 +144,48 @@
             document.getElementById('loader').classList.remove('hidden');
 
             for(let file of files) {
-                try {
-                    await processAndSave(file);
-                } catch (err) {
-                    alert("المساحة ممتلئة! يرجى حذف بعض الملابس القديمة.");
-                    break;
-                }
+                await processImage(file);
             }
-            renderCloset(); closeUploadModal(); e.target.value = '';
+            saveToStorage();
+            renderCloset();
+            closeUploadModal();
+            e.target.value = '';
         };
 
-        function processAndSave(file) {
-            return new Promise((resolve, reject) => {
+        function processImage(file) {
+            return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = (event) => {
+                reader.onload = (e) => {
                     const img = new Image();
-                    img.src = event.target.result;
+                    img.src = e.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 500; // Optimized for performance
-                        canvas.width = MAX_WIDTH;
-                        canvas.height = img.height * (MAX_WIDTH / img.width);
+                        const SCALE = 450; 
+                        let w = img.width, h = img.height;
+                        if(w > h) { h = h * (SCALE/w); w = SCALE; } else { w = w * (SCALE/h); h = SCALE; }
+                        canvas.width = w; canvas.height = h;
                         const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        
-                        const compressedData = canvas.toDataURL('image/jpeg', 0.5);
-                        closet.push({ id: Date.now() + Math.random(), image: compressedData, category: tempCat, isClean: true });
-                        
-                        if(!save()) reject("Full");
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const base64 = canvas.toDataURL('image/jpeg', 0.6);
+                        closet.push({ id: Date.now() + Math.random(), image: base64, category: tempCat, isClean: true });
                         resolve();
                     };
                 };
             });
         }
 
-        // --- Stylist Logic ---
+        // --- المنظم (Stylist) ---
         function generateOutfit() {
             const get = (cat) => closet.filter(i => i.isClean && i.category === cat);
             const t = get('Tops'), b = get('Bottoms'), s = get('Shoes');
-            if(!t.length || !b.length || !s.length) return alert("تحتاج لملابس نظيفة في كل قسم!");
+            
+            if(!t.length || !b.length || !s.length) return alert("تأكد من وجود ملابس نظيفة في كل قسم!");
 
             currentOutfit.Tops = t[Math.floor(Math.random()*t.length)];
             currentOutfit.Bottoms = b[Math.floor(Math.random()*b.length)];
             currentOutfit.Shoes = s[Math.floor(Math.random()*s.length)];
+            
             renderOutfitDisplay();
         }
 
@@ -185,57 +194,67 @@
             display.innerHTML = Object.keys(currentOutfit).map(cat => {
                 const item = currentOutfit[cat];
                 return `
-                <div onclick="openSwapModal('${cat}')" class="glass p-3 md:p-4 rounded-[25px] flex items-center gap-4 md:gap-6 shadow-sm editable-item transition-all border-2 border-transparent hover:border-black">
-                    <img src="${item.image}" class="w-20 h-20 md:w-28 md:h-28 object-cover rounded-xl shadow bg-gray-50">
-                    <div class="text-right flex-1">
-                        <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">${cat}</p>
-                        <p class="text-base md:text-lg font-bold italic leading-tight">تغيير القطعة</p>
+                <div onclick="openSwapModal('${cat}')" class="bg-white p-4 rounded-[30px] flex items-center gap-6 shadow-md border hover:border-black cursor-pointer transition-all">
+                    <img src="${item.image}" class="w-24 h-24 object-cover rounded-2xl">
+                    <div class="text-right">
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">${cat}</p>
+                        <p class="text-xl font-bold italic leading-none mt-1">اضغط للتبديل</p>
                     </div>
-                    <span class="text-gray-300 font-bold ml-2">🔄</span>
+                    <span class="mr-auto text-gray-200">🔄</span>
                 </div>`;
             }).join('');
             document.getElementById('confirm-btn').classList.remove('hidden');
         }
 
-        function openSwapModal(category) {
-            tempCat = category;
-            const alternatives = closet.filter(i => i.isClean && i.category === category);
-            document.getElementById('swap-title').innerText = `بدائل: ${category}`;
+        function openSwapModal(cat) {
+            tempCat = cat;
+            const alternatives = closet.filter(i => i.isClean && i.category === cat);
             const grid = document.getElementById('swap-grid');
             grid.innerHTML = alternatives.map(item => `
-                <div onclick="selectReplacement(${item.id})" class="card-fashion border-4 ${currentOutfit[category].id === item.id ? 'border-blue-500' : 'border-transparent'}">
-                    <img src="${item.image}" class="w-full h-44 object-cover">
+                <div onclick="selectReplacement(${item.id})" class="rounded-2xl overflow-hidden border-4 ${currentOutfit[cat].id === item.id ? 'border-white' : 'border-transparent'}">
+                    <img src="${item.image}" class="w-full h-40 object-cover">
                 </div>
             `).join('');
             document.getElementById('swapModal').classList.remove('hidden');
         }
 
-        function closeSwapModal() { document.getElementById('swapModal').classList.add('hidden'); }
-
         function selectReplacement(id) {
             currentOutfit[tempCat] = closet.find(i => i.id === id);
-            renderOutfitDisplay(); closeSwapModal();
+            renderOutfitDisplay();
+            closeSwapModal();
         }
 
+        function closeSwapModal() { document.getElementById('swapModal').classList.add('hidden'); }
+
+        // --- اعتماد اللبس وحفظه في السجل ---
         function confirmOutfit() {
             Object.values(currentOutfit).forEach(o => {
                 const item = closet.find(c => c.id === o.id);
                 if(item) item.isClean = false;
             });
-            history.push({ date: new Date().toLocaleDateString('ar-EG', {day:'numeric', month:'short'}), id: Date.now() });
-            save(); location.reload();
+
+            const newLog = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' }),
+                images: [currentOutfit.Tops.image, currentOutfit.Bottoms.image, currentOutfit.Shoes.image]
+            };
+            
+            history.push(newLog);
+            saveToStorage();
+            alert("تم اعتماد الطقم بنجاح!");
+            location.reload();
         }
 
-        // --- Core Functions ---
+        // --- عرض الدولاب والتحكم اليدوي ---
         function renderCloset() {
             const grid = document.getElementById('closet-grid');
-            document.getElementById('item-count').innerText = `${closet.length} قطع`;
+            document.getElementById('item-count').innerText = closet.length;
             grid.innerHTML = closet.map(i => `
-                <div class="card-fashion relative group">
-                    <img src="${i.image}" class="w-full h-44 object-cover bg-gray-100">
-                    <button onclick="deleteItem(${i.id})" class="absolute top-2 left-2 w-7 h-7 bg-white/90 rounded-full text-red-500 text-xs opacity-0 group-hover:opacity-100 transition shadow">✕</button>
-                    <div class="p-3 flex justify-between items-center bg-white border-t">
-                        <span class="text-[10px] font-black text-gray-400 uppercase">${i.category}</span>
+                <div class="fashion-card">
+                    <button onclick="deleteItemManual(${i.id})" class="delete-btn">✕</button>
+                    <img src="${i.image}" class="w-full h-52 object-cover">
+                    <div class="p-4 flex justify-between items-center bg-white border-t">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">${i.category}</span>
                         <label class="switch">
                             <input type="checkbox" ${i.isClean?'checked':''} onchange="toggleClean(${i.id})">
                             <span class="slider"></span>
@@ -245,28 +264,43 @@
         }
 
         function toggleClean(id) {
-            const i = closet.find(c => c.id === id);
-            i.isClean = !i.isClean; save(); renderCloset();
+            const item = closet.find(c => c.id === id);
+            if(item) item.isClean = !item.isClean;
+            saveToStorage();
+            renderCloset();
         }
 
-        function deleteItem(id) {
-            if(confirm("حذف هذه القطعة؟")) { closet = closet.filter(c => c.id !== id); save(); renderCloset(); }
+        // حذف يدوي بقرار المستخدم فقط
+        function deleteItemManual(id) {
+            if(confirm("هل أنت متأكد من حذف هذه القطعة نهائياً؟")) {
+                closet = closet.filter(c => c.id !== id);
+                saveToStorage();
+                renderCloset();
+            }
         }
 
         function renderHistory() {
-            document.getElementById('history-list').innerHTML = history.slice().reverse().map(h => `
-                <div class="glass p-5 rounded-2xl flex justify-between items-center shadow-sm">
-                    <span class="font-black text-gray-400 uppercase tracking-tighter">OUTFIT LOGGED</span>
-                    <span class="font-bold text-black">${h.date}</span>
+            const list = document.getElementById('history-list');
+            if(history.length === 0) {
+                list.innerHTML = `<p class="text-center py-20 text-gray-400 italic">لا يوجد سجل ملابس بعد</p>`;
+                return;
+            }
+            list.innerHTML = history.slice().reverse().map(h => `
+                <div class="bg-white p-5 rounded-[30px] shadow-sm border border-gray-100">
+                    <p class="text-xs font-black text-gray-400 mb-4 uppercase tracking-widest">${h.date}</p>
+                    <div class="flex gap-3">
+                        ${h.images.map(img => `<img src="${img}" class="w-16 h-16 object-cover rounded-xl border border-gray-50">`).join('')}
+                    </div>
                 </div>`).join('');
         }
 
-        function save() {
+        function saveToStorage() {
             try {
-                localStorage.setItem('style_vFinal_closet', JSON.stringify(closet));
-                localStorage.setItem('style_vFinal_history', JSON.stringify(history));
-                return true;
-            } catch (e) { return false; }
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(closet));
+                localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            } catch (e) {
+                alert("ذاكرة المتصفح ممتلئة! يرجى حذف بعض القطع يدوياً من الدولاب لتتمكن من إضافة المزيد.");
+            }
         }
 
         showSection('planner');
