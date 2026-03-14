@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StyleSync | دولابك الذكي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background-color: #F8F8F8; 
+            color: #1a1a1a; 
+            scroll-behavior: smooth;
+        }
+        .card-shadow { box-shadow: 0 10px 30px rgba(0,0,0,0.04); }
+        .rounded-20 { border-radius: 20px; }
+        .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        
+        /* تصميم مخصص للـ Switch (زر الـ Clean/Dirty) */
+        .switch {
+            position: relative; display: inline-block; width: 40px; height: 20px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #000; }
+        input:checked + .slider:before { transform: translateX(20px); }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen">
+
+    <nav class="fixed bottom-0 w-full glass-nav border-t md:relative md:w-64 md:h-screen md:border-r md:border-t-0 z-50 flex md:flex-col justify-around md:justify-start p-4 md:pt-10 md:space-y-4">
+        <h1 class="hidden md:block text-2xl font-bold tracking-tighter mb-10 px-4 text-center">STYLE SYNC</h1>
+        
+        <button onclick="showSection('planner')" class="nav-item flex flex-col md:flex-row items-center p-3 w-full gap-3 transition hover:bg-black/5 rounded-xl">
+            <span class="text-xl">📅</span> <span class="text-[10px] md:text-base font-bold">المنظم</span>
+        </button>
+        
+        <button onclick="showSection('closet')" class="nav-item flex flex-col md:flex-row items-center p-3 w-full gap-3 transition hover:bg-black/5 rounded-xl">
+            <span class="text-xl">👕</span> <span class="text-[10px] md:text-base font-bold">الدولاب</span>
+        </button>
+        
+        <button onclick="showSection('history')" class="nav-item flex flex-col md:flex-row items-center p-3 w-full gap-3 transition hover:bg-black/5 rounded-xl">
+            <span class="text-xl">🕒</span> <span class="text-[10px] md:text-base font-bold">السجل</span>
+        </button>
+    </nav>
+
+    <main class="flex-1 p-6 md:p-12 mb-20 md:mb-0 overflow-y-auto">
+        
+        <section id="planner" class="content-section max-w-xl mx-auto">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold italic tracking-tight">إطلالة اليوم</h2>
+                <p class="text-gray-400 text-sm mt-2">منسق الذكاء الاصطناعي الخاص بك</p>
+            </div>
+            
+            <div id="outfit-display" class="space-y-4">
+                <div class="py-16 border-2 border-dashed border-gray-200 rounded-20 text-center text-gray-400">
+                    لا يوجد طقم مقترح حالياً
+                </div>
+            </div>
+
+            <div class="mt-8 flex flex-col gap-3">
+                <button onclick="generateOutfit()" class="w-full bg-black text-white py-4 rounded-20 font-bold text-lg shadow-xl hover:bg-zinc-800 transition active:scale-95">
+                    اختار لي طقم ✨
+                </button>
+                <button id="confirm-outfit-btn" onclick="confirmOutfit()" class="hidden w-full border-2 border-black py-4 rounded-20 font-bold text-lg hover:bg-black hover:text-white transition">
+                    اعتمدت هذا اللبس ✅
+                </button>
+            </div>
+        </section>
+
+        <section id="closet" class="content-section hidden relative min-h-[70vh]">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold italic">دولابك</h2>
+                <span id="item-count" class="bg-gray-200 px-3 py-1 rounded-full text-xs font-bold">0 قطع</span>
+            </div>
+
+            <div id="closet-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                </div>
+
+            <button onclick="openUploadModal()" class="fixed bottom-24 md:bottom-12 left-8 md:left-12 w-16 h-16 bg-black text-white rounded-full shadow-2xl flex items-center justify-center text-3xl z-50 hover:scale-110 active:scale-90 transition-all">
+                +
+            </button>
+        </section>
+
+        <section id="history" class="content-section hidden">
+            <h2 class="text-3xl font-bold italic mb-8">سجل الأناقة</h2>
+            <div id="history-list" class="space-y-4">
+                </div>
+        </section>
+
+    </main>
+
+    <div id="uploadModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-20 p-8 max-w-sm w-full shadow-2xl transform transition-all scale-100">
+            <h3 class="text-2xl font-bold mb-2 text-center">إضافة جديدة</h3>
+            <p class="text-gray-500 text-sm text-center mb-8">ما هو نوع القطعة التي تود إضافتها؟</p>
+            
+            <div class="grid grid-cols-1 gap-3 text-right">
+                <button onclick="triggerFile('Tops')" class="flex items-center justify-between p-4 border rounded-xl hover:bg-gray-50 transition font-bold text-gray-700">
+                    <span>👕 قطع علوية</span> <span>←</span>
+                </button>
+                <button onclick="triggerFile('Bottoms')" class="flex items-center justify-between p-4 border rounded-xl hover:bg-gray-50 transition font-bold text-gray-700">
+                    <span>👖 قطع سفلية</span> <span>←</span>
+                </button>
+                <button onclick="triggerFile('Shoes')" class="flex items-center justify-between p-4 border rounded-xl hover:bg-gray-50 transition font-bold text-gray-700">
+                    <span>👟 أحذية</span> <span>←</span>
+                </button>
+                <button onclick="closeUploadModal()" class="mt-4 text-center text-red-400 font-bold py-2">إلغاء</button>
+            </div>
+            <input type="file" id="actualInput" class="hidden" accept="image/*" onchange="handleFile(this)">
+        </div>
+    </div>
+
+    <script>
+        // --- State ---
+        let closet = JSON.parse(localStorage.getItem('style_closet')) || [];
+        let history = JSON.parse(localStorage.getItem('style_history')) || [];
+        let currentSelection = [];
+        let tempCategory = '';
+
+        // --- Navigation Logic ---
+        function showSection(id) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 'closet') renderCloset();
+            if(id === 'history') renderHistory();
+        }
+
+        // --- Upload Logic ---
+        function openUploadModal() { document.getElementById('uploadModal').classList.remove('hidden'); }
+        function closeUploadModal() { document.getElementById('uploadModal').classList.add('hidden'); }
+
+        function triggerFile(cat) {
+            tempCategory = cat;
+            document.getElementById('actualInput').click();
+        }
+
+        function handleFile(input) {
+            const file = input.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const item = {
+                    id: Date.now(),
+                    image: e.target.result,
+                    category: tempCategory,
+                    isClean: true
+                };
+                closet.push(item);
+                save();
+                renderCloset();
+                closeUploadModal();
+                input.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- AI Algorithm (Random + Clean + Cooldown) ---
+        function generateOutfit() {
+            const tops = closet.filter(i => i.isClean && i.category === 'Tops');
+            const bottoms = closet.filter(i => i.isClean && i.category === 'Bottoms');
+            const shoes = closet.filter(i => i.isClean && i.category === 'Shoes');
+
+            if(!tops.length || !bottoms.length || !shoes.length) {
+                alert("تحتاج إلى قطعة واحدة نظيفة على الأقل من كل نوع!");
+                return;
+            }
+
+            let result = [
+                tops[Math.floor(Math.random() * tops.length)],
+                bottoms[Math.floor(Math.random() * bottoms.length)],
+                shoes[Math.floor(Math.random() * shoes.length)]
+            ];
+
+            // Cooldown Logic: Check if identical to last entry in history
+            if(history.length > 0) {
+                const lastOutfitIds = history[history.length-1].ids.sort().join();
+                const currentIds = result.map(r => r.id).sort().join();
+                if(lastIds === currentIds && (tops.length > 1 || bottoms.length > 1)) {
+                    return generateOutfit(); // Retry
+                }
+            }
+
+            currentSelection = result;
+            displayOutfit();
+        }
+
+        function displayOutfit() {
+            const container = document.getElementById('outfit-display');
+            container.innerHTML = currentSelection.map(item => `
+                <div class="bg-white p-3 rounded-20 card-shadow flex items-center gap-4">
+                    <img src="${item.image}" class="w-24 h-24 object-cover rounded-xl shadow-inner">
+                    <div class="text-right">
+                        <span class="text-[10px] bg-gray-100 px-2 py-1 rounded font-bold text-gray-500 uppercase">${item.category}</span>
+                        <p class="font-bold text-lg mt-1">قطعة مميزة</p>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('confirm-outfit-btn').classList.remove('hidden');
+        }
+
+        function confirmOutfit() {
+            const log = {
+                date: new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' }),
+                ids: currentSelection.map(i => i.id)
+            };
+            
+            // Auto mark as dirty
+            currentSelection.forEach(selected => {
+                const item = closet.find(c => c.id === selected.id);
+                if(item) item.isClean = false;
+            });
+
+            history.push(log);
+            save();
+            alert("تم حفظ الاختيار وتغيير حالة الملابس لـ 'غير نظيفة'");
+            location.reload();
+        }
+
+        // --- Closet Logic ---
+        function renderCloset() {
+            const grid = document.getElementById('closet-grid');
+            document.getElementById('item-count').innerText = `${closet.length} قطع`;
+            
+            if(closet.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400 italic">دولابك فارغ حالياً، اضغط على + للإضافة</div>`;
+                return;
+            }
+
+            grid.innerHTML = closet.map(item => `
+                <div class="bg-white rounded-20 overflow-hidden card-shadow relative group">
+                    <button onclick="deleteItem(${item.id})" class="absolute top-2 left-2 bg-white/80 w-8 h-8 rounded-full text-red-500 opacity-0 group-hover:opacity-100 transition shadow-sm">✕</button>
+                    <img src="${item.image}" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] font-bold text-gray-400">${item.category}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold">${item.isClean ? 'نظيف ✨' : 'متسخ 🧺'}</span>
+                            <label class="switch">
+                                <input type="checkbox" ${item.isClean ? 'checked' : ''} onchange="toggleStatus(${item.id})">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleStatus(id) {
+            const item = closet.find(i => i.id === id);
+            item.isClean = !item.isClean;
+            save();
+            renderCloset();
+        }
+
+        function deleteItem(id) {
+            if(confirm("هل تريد حذف هذه القطعة؟")) {
+                closet = closet.filter(i => i.id !== id);
+                save();
+                renderCloset();
+            }
+        }
+
+        // --- History Logic ---
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            if(history.length === 0) {
+                list.innerHTML = `<p class="text-center text-gray-400 py-10">لا يوجد سجل ملابس بعد.</p>`;
+                return;
+            }
+            list.innerHTML = history.slice().reverse().map(log => `
+                <div class="bg-white p-5 rounded-20 card-shadow flex justify-between items-center border border-gray-100">
+                    <div class="flex gap-1">
+                         ${log.ids.length} <span class="text-gray-400">قطع</span>
+                    </div>
+                    <span class="font-bold">${log.date}</span>
+                </div>
+            `).join('');
+        }
+
+        function save() {
+            localStorage.setItem('style_closet', JSON.stringify(closet));
+            localStorage.setItem('style_history', JSON.stringify(history));
+        }
+
+        // Init
+        showSection('planner');
+    </script>
+</body>
+</html>
