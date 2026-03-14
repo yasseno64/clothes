@@ -1,522 +1,327 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StyleSync Master | النسخة النهائية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --accent: #000000; }
+        .dark-mode { --bg: #020617; --card: #1e293b; --text: #f8fafc; --accent: #38bdf8; }
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            overflow-x: hidden;
+        }
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        /* تأثيرات اللمس الاحترافية */
+        button, .clickable {
+            transition: transform 0.1s ease, opacity 0.1s ease;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        button:active, .clickable:active {
+            transform: scale(0.92);
+            opacity: 0.7;
+        }
 
-<title>StyleSync Master</title>
+        .fashion-card { 
+            background: var(--card); 
+            border-radius: 28px; 
+            overflow: hidden; 
+            border: 1px solid rgba(0,0,0,0.05);
+            will-change: transform;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
 
-<script src="https://cdn.tailwindcss.com"></script>
+        .glass-nav { 
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(25px); 
+            -webkit-backdrop-filter: blur(25px);
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        .dark-mode .glass-nav { background: rgba(15, 23, 42, 0.8); border-top: 1px solid rgba(255,255,255,0.05); }
 
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+        .delete-btn {
+            position: absolute; top: 12px; left: 12px; 
+            background: rgba(255, 71, 87, 0.9); color: white; 
+            width: 32px; height: 32px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            z-index: 30; border: none; font-size: 14px;
+        }
 
-<style>
+        .loader-spin { 
+            width: 35px; height: 35px; 
+            border: 4px solid rgba(0,0,0,0.05); 
+            border-top: 4px solid var(--accent); 
+            border-radius: 50%; 
+            animation: spin 0.8s linear infinite; 
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-:root{
---bg:#f8fafc;
---card:#ffffff;
---text:#0f172a;
---accent:#000;
-}
+        .section-fade { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-.dark-mode{
---bg:#020617;
---card:#1e293b;
---text:#f8fafc;
---accent:#38bdf8;
-}
-
-body{
-font-family:'Plus Jakarta Sans',sans-serif;
-background:var(--bg);
-color:var(--text);
-transition:.3s;
-overflow-x:hidden;
-}
-
-button{
-transition:.1s;
-}
-
-button:active{
-transform:scale(.9);
-opacity:.7;
-}
-
-.fashion-card{
-background:var(--card);
-border-radius:25px;
-overflow:hidden;
-border:1px solid rgba(0,0,0,.05);
-}
-
-.glass-nav{
-background:rgba(255,255,255,.8);
-backdrop-filter:blur(25px);
-}
-
-.dark-mode .glass-nav{
-background:rgba(15,23,42,.8);
-}
-
-.loader-spin{
-width:35px;
-height:35px;
-border:4px solid rgba(0,0,0,.1);
-border-top:4px solid var(--accent);
-border-radius:50%;
-animation:spin .8s linear infinite;
-}
-
-@keyframes spin{
-to{transform:rotate(360deg);}
-}
-
-.toast-show{
-opacity:1 !important;
-transform:translate(-50%,-10px);
-}
-
-</style>
+        #swapModal { background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    </style>
 </head>
-
 <body class="pb-32">
 
-<!-- Toast -->
-<div id="toast" class="fixed bottom-32 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 rounded-2xl text-sm font-bold opacity-0 transition-all duration-300 z-[999]"></div>
-
-<div class="fixed top-6 left-6 z-[100] flex flex-col gap-4">
-
-<button onclick="toggleDarkMode()" class="w-14 h-14 rounded-full bg-white shadow-xl flex items-center justify-center text-2xl">
-<span id="theme-icon">🌙</span>
-</button>
-
-<button onclick="resetSystem()" class="w-14 h-14 rounded-full bg-red-100 text-red-600 text-xs font-bold">
-مسح
-</button>
-
-</div>
-
-<header class="pt-12 pb-8 text-center">
-
-<h1 class="text-5xl font-black italic">STYLE<span class="text-blue-500">SYNC</span></h1>
-
-<p class="text-gray-400 text-xs mt-2 font-bold uppercase tracking-[0.3em]">Wardrobe</p>
-
-</header>
-
-<main class="max-w-md mx-auto px-6">
-
-<section id="planner">
-
-<div id="outfit-display" class="space-y-4 mb-8">
-
-<div class="py-28 border-2 border-dashed border-gray-200 rounded-[40px] text-center text-gray-400 font-bold">
-
-ابدأ يومك بتنسيق مثالي ✨
-
-</div>
-
-</div>
-
-<button onclick="vibrate();generateOutfit()" class="w-full bg-black text-white py-6 rounded-[30px] font-black text-xl">
-
-تنسيق طقم
-
-</button>
-
-<button id="confirm-btn" class="hidden w-full mt-4 border py-5 rounded-[30px] font-black" onclick="confirmOutfit()">
-
-اعتمد اللبس
-
-</button>
-
-</section>
-
-<section id="closet" class="hidden">
-
-<div class="flex justify-between mb-6">
-
-<h2 class="text-3xl font-black">الدولاب</h2>
-
-<p id="closet-count"></p>
-
-</div>
-
-<div id="closet-grid" class="grid grid-cols-2 gap-4"></div>
-
-<button onclick="openModal()" class="fixed bottom-36 right-8 w-20 h-20 bg-black text-white rounded-full text-4xl">+</button>
-
-</section>
-
-<section id="history" class="hidden">
-
-<h2 class="text-3xl font-black mb-8">السجل</h2>
-
-<div id="history-list" class="space-y-6"></div>
-
-</section>
-
-</main>
-
-<nav class="fixed bottom-0 w-full glass-nav p-6 flex justify-around">
-
-<button onclick="showSection('planner')">🏠</button>
-
-<button onclick="showSection('closet')">👕</button>
-
-<button onclick="showSection('history')">⏳</button>
-
-</nav>
-
-<!-- Upload Modal -->
-
-<div id="uploadModal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center">
-
-<div class="bg-white rounded-[40px] p-10 w-full max-w-sm text-center">
-
-<h3 class="text-2xl font-black mb-8">إضافة ملابس</h3>
-
-<div class="grid gap-4">
-
-<button onclick="triggerFile('Tops')" class="py-4 bg-gray-100 rounded-xl font-bold">👕 قطعة علوية</button>
-
-<button onclick="triggerFile('Bottoms')" class="py-4 bg-gray-100 rounded-xl font-bold">👖 قطعة سفلية</button>
-
-<button onclick="triggerFile('Shoes')" class="py-4 bg-gray-100 rounded-xl font-bold">👟 حذاء</button>
-
-<button onclick="closeModal()" class="text-red-500 mt-4 font-bold">إلغاء</button>
-
-</div>
-
-<input type="file" id="fileInput" class="hidden" accept="image/*" multiple>
-
-</div>
-
-</div>
-
-<script>
-
-const DB_KEY='STYLE_SYNC_MASTER_FINAL';
-
-let state=JSON.parse(localStorage.getItem(DB_KEY))||{closet:[],history:[],dark:false};
-
-let activeCat='';
-
-window.currentOutfit={};
-
-function showToast(msg){
-
-const t=document.getElementById("toast");
-
-t.innerText=msg;
-
-t.classList.add("toast-show");
-
-setTimeout(()=>{t.classList.remove("toast-show");},2500);
-
-}
-
-function vibrate(){
-
-if(navigator.vibrate) navigator.vibrate(30);
-
-}
-
-function triggerFile(cat){
-
-activeCat=cat;
-
-document.getElementById("fileInput").click();
-
-}
-
-document.getElementById("fileInput").addEventListener("change",async function(e){
-
-const files=[...e.target.files];
-
-for(let file of files){
-
-await processImage(file);
-
-}
-
-save();
-
-renderCloset();
-
-closeModal();
-
-showToast("تمت إضافة الملابس");
-
-});
-
-async function processImage(file){
-
-return new Promise(resolve=>{
-
-const reader=new FileReader();
-
-reader.onload=e=>{
-
-const img=new Image();
-
-img.onload=()=>{
-
-const canvas=document.createElement("canvas");
-
-const MAX=400;
-
-canvas.width=MAX;
-
-canvas.height=img.height*(MAX/img.width);
-
-const ctx=canvas.getContext("2d");
-
-ctx.drawImage(img,0,0,canvas.width,canvas.height);
-
-state.closet.push({
-
-id:Date.now()+Math.random(),
-
-img:canvas.toDataURL("image/jpeg",.6),
-
-cat:activeCat,
-
-clean:true
-
-});
-
-resolve();
-
-};
-
-img.src=e.target.result;
-
-};
-
-reader.readAsDataURL(file);
-
-});
-
-}
-
-function generateOutfit(){
-
-const display=document.getElementById("outfit-display");
-
-display.innerHTML=`<div class="flex justify-center py-20"><div class="loader-spin"></div></div>`;
-
-setTimeout(()=>{
-
-const get=c=>state.closet.filter(i=>i.clean&&i.cat===c);
-
-const t=get("Tops");
-
-const b=get("Bottoms");
-
-const s=get("Shoes");
-
-if(!t.length||!b.length||!s.length){
-
-showToast("أضف ملابس أولاً");
-
-return;
-
-}
-
-window.currentOutfit={
-
-Tops:t[Math.floor(Math.random()*t.length)],
-
-Bottoms:b[Math.floor(Math.random()*b.length)],
-
-Shoes:s[Math.floor(Math.random()*s.length)]
-
-};
-
-renderOutfit();
-
-},700);
-
-}
-
-function renderOutfit(){
-
-const d=document.getElementById("outfit-display");
-
-d.innerHTML=Object.keys(window.currentOutfit).map(k=>`
-
-<div class="fashion-card p-4 flex gap-4">
-
-<img loading="lazy" src="${window.currentOutfit[k].img}" class="w-24 h-24 object-cover rounded-xl">
-
-<div>
-
-<p class="text-xs text-blue-500">${k}</p>
-
-<p class="font-bold">قطعة مختارة</p>
-
-</div>
-
-</div>
-
-`).join("");
-
-document.getElementById("confirm-btn").classList.remove("hidden");
-
-}
-
-function confirmOutfit(){
-
-Object.values(window.currentOutfit).forEach(o=>{
-
-const item=state.closet.find(i=>i.id===o.id);
-
-if(item) item.clean=false;
-
-});
-
-state.history.push({
-
-date:new Date().toLocaleDateString("ar-EG"),
-
-imgs:Object.values(window.currentOutfit).map(o=>o.img)
-
-});
-
-save();
-
-showToast("تم حفظ الطقم");
-
-location.reload();
-
-}
-
-function renderCloset(){
-
-const grid=document.getElementById("closet-grid");
-
-grid.innerHTML=state.closet.map(i=>`
-
-<div class="fashion-card">
-
-<img loading="lazy" src="${i.img}" class="w-full h-48 object-cover">
-
-<div class="p-3 flex justify-between">
-
-<span class="text-xs">${i.cat}</span>
-
-<input type="checkbox" ${i.clean?'checked':''} onchange="toggleClean(${i.id})">
-
-</div>
-
-</div>
-
-`).join("");
-
-document.getElementById("closet-count").innerText=state.closet.length+" قطع";
-
-}
-
-function renderHistory(){
-
-const list=document.getElementById("history-list");
-
-list.innerHTML=state.history.map(h=>`
-
-<div class="fashion-card p-4">
-
-<p class="text-xs mb-3">${h.date}</p>
-
-<div class="flex gap-2 overflow-x-auto">
-
-${h.imgs.map(img=>`<img loading="lazy" src="${img}" class="w-16 h-16 object-cover rounded">`).join("")}
-
-</div>
-
-</div>
-
-`).join("");
-
-}
-
-function save(){
-
-localStorage.setItem(DB_KEY,JSON.stringify(state));
-
-}
-
-function toggleDarkMode(){
-
-state.dark=!state.dark;
-
-applyTheme();
-
-save();
-
-}
-
-function applyTheme(){
-
-document.body.classList.toggle("dark-mode",state.dark);
-
-document.getElementById("theme-icon").innerText=state.dark?"☀️":"🌙";
-
-}
-
-function showSection(id){
-
-document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));
-
-document.getElementById(id).classList.remove("hidden");
-
-if(id==="closet") renderCloset();
-
-if(id==="history") renderHistory();
-
-}
-
-function toggleClean(id){
-
-const i=state.closet.find(c=>c.id===id);
-
-if(i) i.clean=!i.clean;
-
-save();
-
-}
-
-function resetSystem(){
-
-if(confirm("مسح كل البيانات؟")){
-
-localStorage.clear();
-
-location.reload();
-
-}
-
-}
-
-function openModal(){
-
-document.getElementById("uploadModal").classList.remove("hidden");
-
-}
-
-function closeModal(){
-
-document.getElementById("uploadModal").classList.add("hidden");
-
-}
-
-applyTheme();
-
-showSection("planner");
-
-</script>
-
+    <div class="fixed top-6 left-6 z-[100] flex flex-col gap-4">
+        <button onclick="toggleDarkMode()" class="w-14 h-14 rounded-full bg-white dark:bg-slate-800 shadow-2xl flex items-center justify-center text-2xl border border-gray-100 dark:border-slate-700">
+            <span id="theme-icon">🌙</span>
+        </button>
+        <button onclick="resetSystem()" class="w-14 h-14 rounded-full bg-red-50 dark:bg-red-900/20 shadow-2xl flex items-center justify-center text-[11px] text-red-600 font-extrabold border border-red-100 dark:border-red-900/50">
+            مسح
+        </button>
+    </div>
+
+    <header class="pt-12 pb-8 text-center">
+        <h1 class="text-5xl font-black italic tracking-tighter">STYLE<span class="text-blue-500">SYNC</span></h1>
+        <p class="text-gray-400 text-xs mt-2 font-bold uppercase tracking-[0.3em] opacity-60">Professional Wardrobe</p>
+    </header>
+
+    <main class="max-w-md mx-auto px-6">
+        
+        <section id="planner" class="section-fade">
+            <div id="outfit-display" class="space-y-4 mb-8">
+                <div class="py-28 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-[50px] text-center text-gray-300 dark:text-slate-600 font-bold italic">
+                    ابدأ يومك بتنسيق مثالي ✨
+                </div>
+            </div>
+            <button onclick="generateOutfit()" class="w-full bg-black dark:bg-blue-600 text-white py-6 rounded-[32px] font-black text-xl shadow-2xl">تنسيق طقم ذكي</button>
+            <button id="confirm-btn" class="hidden w-full mt-4 border-2 border-gray-300 dark:border-slate-700 py-5 rounded-[32px] font-black text-lg" onclick="confirmOutfit()">اعتمدت هذا اللبس ✅</button>
+        </section>
+
+        <section id="closet" class="hidden section-fade">
+            <div class="flex justify-between items-end mb-8">
+                <h2 class="text-3xl font-black italic">الدولاب</h2>
+                <p id="closet-count" class="text-xs font-bold opacity-40 uppercase"></p>
+            </div>
+            <div id="closet-grid" class="grid grid-cols-2 gap-5"></div>
+            <button onclick="openModal()" class="fixed bottom-36 right-8 w-20 h-20 bg-black dark:bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center text-4xl z-50">+</button>
+        </section>
+
+        <section id="history" class="hidden section-fade">
+            <h2 class="text-3xl font-black mb-8 italic">السجل</h2>
+            <div id="history-list" class="space-y-6"></div>
+        </section>
+    </main>
+
+    <nav class="fixed bottom-0 w-full glass-nav p-6 flex justify-around items-center z-[90]">
+        <button onclick="showSection('planner')" class="flex flex-col items-center gap-1 font-black text-[10px]">🏠<span>الرئيسية</span></button>
+        <button onclick="showSection('closet')" class="flex flex-col items-center gap-1 font-black text-[10px]">👕<span>الدولاب</span></button>
+        <button onclick="showSection('history')" class="flex flex-col items-center gap-1 font-black text-[10px]">⏳<span>السجل</span></button>
+    </nav>
+
+    <div id="uploadModal" class="fixed inset-0 bg-black/70 backdrop-blur-xl hidden z-[200] flex items-end sm:items-center justify-center p-6">
+        <div class="bg-white dark:bg-slate-900 rounded-[50px] p-10 w-full max-w-sm text-center shadow-2xl mb-20 sm:mb-0">
+            <div id="modal-ui">
+                <h3 class="text-2xl font-black mb-8 italic">إضافة ملابس</h3>
+                <div class="grid gap-4">
+                    <button onclick="triggerFile('Tops')" class="w-full py-5 bg-gray-50 dark:bg-slate-800 rounded-3xl font-extrabold text-lg">👕 قطعة علوية</button>
+                    <button onclick="triggerFile('Bottoms')" class="w-full py-5 bg-gray-50 dark:bg-slate-800 rounded-3xl font-extrabold text-lg">👖 قطعة سفلية</button>
+                    <button onclick="triggerFile('Shoes')" class="w-full py-5 bg-gray-50 dark:bg-slate-800 rounded-3xl font-extrabold text-lg">👟 حذاء</button>
+                    <button onclick="closeModal()" class="mt-6 text-red-500 font-black text-sm uppercase tracking-widest">إلغاء</button>
+                </div>
+            </div>
+            <div id="loading-ui" class="hidden py-10 flex flex-col items-center">
+                <div class="loader-spin mb-6"></div>
+                <p id="loading-text" class="font-black text-blue-500">جاري المعالجة...</p>
+            </div>
+            <input type="file" id="fileInput" class="hidden" accept="image/*" multiple>
+        </div>
+    </div>
+
+    <div id="swapModal" class="fixed inset-0 hidden z-[300] flex flex-col p-8 overflow-hidden">
+        <div class="flex justify-between items-center mb-10 text-white">
+            <h3 class="text-3xl font-black italic">اختر البديل</h3>
+            <button onclick="closeSwapModal()" class="text-5xl font-light">&times;</button>
+        </div>
+        <div id="swap-grid" class="grid grid-cols-2 gap-5 overflow-y-auto pb-32"></div>
+    </div>
+
+    <script>
+        const DB_KEY = 'STYLE_SYNC_MASTER_FINAL';
+        let state = JSON.parse(localStorage.getItem(DB_KEY)) || { closet: [], history: [], dark: false };
+        let activeCat = '';
+        window.currentOutfit = { Tops: null, Bottoms: null, Shoes: null };
+
+        // --- نظام الرفع المتعدد المستقر ---
+        function triggerFile(cat) { activeCat = cat; document.getElementById('fileInput').click(); }
+
+        document.getElementById('fileInput').addEventListener('change', async function(e) {
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+
+            document.getElementById('modal-ui').classList.add('hidden');
+            document.getElementById('loading-ui').classList.remove('hidden');
+
+            for (let i = 0; i < files.length; i++) {
+                // تم إصلاح الخطأ هنا بإضافة `
+                document.getElementById('loading-text').innerText = `يتم الحفظ (${i+1} / ${files.length})`;
+                await new Promise(r => requestAnimationFrame(r));
+                await processImage(files[i]);
+            }
+
+            save(); renderCloset(); closeModal();
+            document.getElementById('modal-ui').classList.remove('hidden');
+            document.getElementById('loading-ui').classList.add('hidden');
+            e.target.value = '';
+        });
+
+        async function processImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_W = 400; // حجم مثالي للموبايل
+                        canvas.width = MAX_W;
+                        canvas.height = img.height * (MAX_W / img.width);
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        state.closet.push({ 
+                            id: Date.now() + Math.random(), 
+                            img: canvas.toDataURL('image/jpeg', 0.6), 
+                            cat: activeCat, 
+                            clean: true 
+                        });
+                        canvas.width = 0; canvas.height = 0; // تفريغ فوري للذاكرة
+                        resolve();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // --- التنسيق والتبديل ---
+        function generateOutfit() {
+            const get = (c) => state.closet.filter(i => i.clean && i.cat === c);
+            const t = get('Tops'), b = get('Bottoms'), s = get('Shoes');
+            if(!t.length || !b.length || !s.length) return alert("أضف ملابس أولاً (قمصان، بناطيل، أحذية) وتأكد أنها نظيفة!");
+            
+            window.currentOutfit = { 
+                Tops: t[Math.floor(Math.random()*t.length)], 
+                Bottoms: b[Math.floor(Math.random()*b.length)], 
+                Shoes: s[Math.floor(Math.random()*s.length)] 
+            };
+            renderOutfitDisplay();
+        }
+
+        function renderOutfitDisplay() {
+            // تم إصلاح الخطأ هنا بإضافة `
+            document.getElementById('outfit-display').innerHTML = Object.keys(window.currentOutfit).map(k => `
+                <div onclick="openSwapModal('${k}')" class="fashion-card p-5 flex items-center gap-6 border-2 border-blue-50 dark:border-slate-800 clickable relative">
+                    <img src="${window.currentOutfit[k].img}" class="w-24 h-24 object-cover rounded-[24px] shadow-sm">
+                    <div class="text-right flex-1">
+                        <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">${k === 'Tops' ? 'قطعة علوية' : k === 'Bottoms' ? 'قطعة سفلية' : 'حذاء'}</p>
+                        <p class="text-xl font-black italic">اضغط للتبديل</p>
+                    </div>
+                    <span class="opacity-20 text-2xl">🔄</span>
+                </div>
+            `).join('');            
+            document.getElementById('confirm-btn').classList.remove('hidden');
+        }
+
+        function openSwapModal(cat) {
+            window.tempSwapCat = cat;
+            const alternatives = state.closet.filter(i => i.clean && i.cat === cat);
+            // تم إصلاح الخطأ هنا بإضافة `
+            document.getElementById('swap-grid').innerHTML = alternatives.map(item => `
+                <div onclick="selectReplacement(${item.id})" class="fashion-card clickable border-4 ${window.currentOutfit[cat].id === item.id ? 'border-blue-500':'border-transparent'} relative">
+                    <img src="${item.img}" class="w-full h-52 object-cover">
+                </div>
+            `).join('');            
+            document.getElementById('swapModal').classList.remove('hidden');
+        }
+
+        function selectReplacement(id) {
+            window.currentOutfit[window.tempSwapCat] = state.closet.find(i => i.id === id);
+            renderOutfitDisplay(); closeSwapModal();
+        }
+
+        function closeSwapModal() { document.getElementById('swapModal').classList.add('hidden'); }
+
+        // --- إدارة النظام ---
+        function renderCloset() {
+            const grid = document.getElementById('closet-grid');
+            // تم إصلاح الخطأ هنا بإضافة `
+            grid.innerHTML = state.closet.map(i => `
+                <div class="fashion-card shadow-sm relative">
+                    <button onclick="deleteItem(${i.id})" class="delete-btn">✕</button>
+                    <img src="${i.img}" class="w-full h-56 object-cover">
+                    <div class="p-4 flex justify-between items-center bg-white dark:bg-slate-800">
+                        <span class="text-[10px] font-black opacity-20 uppercase tracking-tighter">${i.cat}</span>
+                        <input type="checkbox" ${i.clean?'checked':''} onchange="toggleClean(${i.id})" class="w-7 h-7 accent-blue-600 rounded-full">
+                    </div>
+                </div>
+            `).join('');            
+            // تم إصلاح الخطأ هنا بإضافة `
+            document.getElementById('closet-count').innerText = `${state.closet.length} قطع`;
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            if(!state.history.length) return list.innerHTML = "<div class='py-20 text-center opacity-20 italic font-bold'>لا توجد سجلات بعد</div>";
+            // تم إصلاح الخطأ هنا بإضافة `
+            list.innerHTML = state.history.slice().reverse().map(h => `
+                <div class="fashion-card p-6 border border-gray-100 dark:border-slate-800">
+                    <p class="text-[11px] font-black opacity-30 mb-5 uppercase tracking-widest text-blue-500">${h.date}</p>
+                    <div class="flex gap-3 overflow-x-auto pb-2">
+                        ${h.imgs.map(img => `<img src="${img}" class="w-20 h-20 object-cover rounded-[18px] shadow-sm border dark:border-slate-700">`).join('')}
+                    </div>
+                </div>
+            `).join('');        
+        }
+
+        function confirmOutfit() {
+            Object.values(window.currentOutfit).forEach(o => {
+                const item = state.closet.find(i => i.id === o.id);
+                if(item) item.clean = false; // يتم تحويل حالة القطعة إلى "غير نظيفة"
+            });
+            // يتم حفظ الصورة نفسها بشكل مستقل في السجل كما طلبت
+            state.history.push({
+                id: Date.now(),
+                date: new Date().toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'}),
+                imgs: [window.currentOutfit.Tops.img, window.currentOutfit.Bottoms.img, window.currentOutfit.Shoes.img]
+            });
+            save(); 
+            alert("تم حفظ الطقم في السجل وتحديث حالة الملابس!");
+            showSection('history'); // الانتقال التلقائي للسجل بعد الحفظ
+        }
+
+        // --- الأساسيات ---
+        function save() { try { localStorage.setItem(DB_KEY, JSON.stringify(state)); } catch(e) { alert("تنبيه: مساحة التخزين في المتصفح ممتلئة! يرجى حذف بعض القطع القديمة."); } }
+        function toggleDarkMode() { state.dark = !state.dark; applyTheme(); save(); }
+        function applyTheme() {
+            document.body.classList.toggle('dark-mode', state.dark);
+            document.getElementById('theme-icon').innerText = state.dark ? '☀️' : '🌙';
+        }
+        function showSection(id) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 'closet') renderCloset();
+            if(id === 'history') renderHistory();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+        function toggleClean(id) { const i = state.closet.find(c => c.id === id); if(i) i.clean = !i.clean; save(); }
+        function deleteItem(id) { if(confirm("هل تريد حذف هذه القطعة نهائياً؟")) { state.closet = state.closet.filter(i => i.id !== id); save(); renderCloset(); } }
+        function resetSystem() { if(confirm("سيتم مسح كل الملابس والسجلات! هل أنت متأكد؟")) { localStorage.removeItem(DB_KEY); location.reload(); } }
+        function openModal() { document.getElementById('uploadModal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('uploadModal').classList.add('hidden'); }
+
+        // تهيئة التطبيق
+        applyTheme();
+        showSection('planner');
+    </script>
 </body>
 </html>
