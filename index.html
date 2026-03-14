@@ -2,96 +2,140 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StyleSync Pro | Stable Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StyleSync Ultra | النسخة النهائية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --accent: #000000; }
-        .dark-mode { --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --accent: #38bdf8; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text); transition: all 0.3s ease; min-height: 100vh; overflow-x: hidden; }
-        .fashion-card { background: var(--card); border-radius: 24px; overflow: hidden; transition: 0.3s; border: 1px solid rgba(0,0,0,0.05); position: relative; }
-        .delete-btn { position: absolute; top: 10px; left: 10px; background: #ff4757; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 20; border: none; cursor: pointer; }
-        .loader-spin { width: 35px; height: 35px; border: 4px solid #f3f3f3; border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        :root { --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --accent: #000000; }
+        .dark-mode { --bg: #020617; --card: #1e293b; --text: #f8fafc; --accent: #38bdf8; }
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            transition: background-color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* تأثيرات الضغط */
+        button, .clickable {
+            transition: transform 0.1s ease, opacity 0.1s ease;
+            cursor: pointer;
+        }
+        button:active, .clickable:active {
+            transform: scale(0.92);
+            opacity: 0.8;
+        }
+
+        .fashion-card { 
+            background: var(--card); 
+            border-radius: 24px; 
+            overflow: hidden; 
+            border: 1px solid rgba(0,0,0,0.05);
+            will-change: transform;
+        }
+
+        .glass-nav { 
+            background: rgba(255, 255, 255, 0.75); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        .dark-mode .glass-nav { background: rgba(15, 23, 42, 0.75); border-top: 1px solid rgba(255,255,255,0.05); }
+
+        .loader-spin { 
+            width: 30px; height: 30px; 
+            border: 3px solid rgba(0,0,0,0.1); 
+            border-top: 3px solid var(--accent); 
+            border-radius: 50%; 
+            animation: spin 0.8s linear infinite; 
+        }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border-top: 1px solid rgba(0,0,0,0.1); position: fixed; bottom: 0; w-full; z-index: 100; }
-        .dark-mode .glass-nav { background: rgba(30, 41, 59, 0.8); }
+
+        /* أنيميشن التنقل */
+        .section-fade { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="pb-28">
 
-    <div class="fixed top-6 left-6 z-[100] flex flex-col gap-3">
-        <button onclick="toggleDarkMode()" class="w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-xl border border-gray-200">
+    <div class="fixed top-5 left-5 z-[100] flex flex-col gap-4">
+        <button onclick="toggleDarkMode()" class="w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-xl border border-gray-100 dark:border-slate-700">
             <span id="theme-icon">🌙</span>
         </button>
-        <button onclick="resetSystem()" class="w-12 h-12 rounded-full bg-red-50 dark:bg-red-900/20 shadow-xl flex items-center justify-center text-xs border border-red-200 text-red-500 font-bold">
-            Reset
+        <button onclick="resetSystem()" class="w-12 h-12 rounded-full bg-red-50 dark:bg-red-900/20 shadow-lg flex items-center justify-center text-[10px] text-red-500 font-bold border border-red-100">
+            مسح
         </button>
     </div>
 
-    <header class="p-8 text-center">
-        <h1 class="text-4xl font-extrabold italic">STYLE<span class="text-blue-500">SYNC</span></h1>
-        <p class="text-gray-500 text-xs mt-1 font-bold uppercase">النسخة فائقة الاستقرار</p>
+    <header class="p-10 text-center">
+        <h1 class="text-4xl font-black italic tracking-tighter">STYLE<span class="text-blue-500">SYNC</span></h1>
+        <p class="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em]">The Final Version</p>
     </header>
 
     <main class="max-w-md mx-auto px-6">
-        <section id="planner">
+        
+        <section id="planner" class="section-fade">
             <div id="outfit-display" class="space-y-4 mb-8">
-                <div class="py-20 border-2 border-dashed border-gray-300 rounded-[40px] text-center text-gray-400 font-bold italic">اضغط لتنسيق طقم اليوم</div>
+                <div class="py-24 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-[40px] text-center text-gray-400 font-bold">
+                    جاهز للأناقة؟ ✨
+                </div>
             </div>
-            <button onclick="generateOutfit()" class="w-full bg-black dark:bg-blue-600 text-white py-5 rounded-[24px] font-black text-xl shadow-2xl active:scale-95 transition-all">تنسيق طقم ✨</button>
-            <button id="confirm-btn" class="hidden w-full mt-4 border-2 border-gray-400 py-4 rounded-[24px] font-bold dark:text-white" onclick="confirmOutfit()">اعتمدت اللبس ✅</button>
+            <button onclick="generateOutfit()" class="w-full bg-black dark:bg-blue-600 text-white py-5 rounded-[28px] font-black text-xl shadow-xl">تنسيق طقم ذكي</button>
+            <button id="confirm-btn" class="hidden w-full mt-4 border-2 border-gray-300 dark:border-slate-700 py-4 rounded-[28px] font-bold" onclick="confirmOutfit()">اعتمدت اللبس ✅</button>
         </section>
 
-        <section id="closet" class="hidden">
-            <h2 class="text-2xl font-black mb-6 italic">CLOSET</h2>
-            <div id="closet-grid" class="grid grid-cols-2 gap-4 pb-10"></div>
-            <button onclick="openModal()" class="fixed bottom-28 right-6 w-16 h-16 bg-black dark:bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center text-3xl z-50">+</button>
+        <section id="closet" class="hidden section-fade">
+            <h2 class="text-2xl font-black mb-6 italic">خزانتك</h2>
+            <div id="closet-grid" class="grid grid-cols-2 gap-4"></div>
+            <button onclick="openModal()" class="fixed bottom-32 right-6 w-16 h-16 bg-black dark:bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center text-3xl z-50">+</button>
         </section>
 
-        <section id="history" class="hidden">
-            <h2 class="text-2xl font-black mb-6 italic">HISTORY</h2>
+        <section id="history" class="hidden section-fade">
+            <h2 class="text-2xl font-black mb-6 italic">السجل</h2>
             <div id="history-list" class="space-y-4"></div>
         </section>
     </main>
 
-    <nav class="fixed bottom-0 w-full glass-nav p-4 flex justify-around items-center">
+    <nav class="fixed bottom-0 w-full glass-nav p-5 flex justify-around items-center z-[90]">
         <button onclick="showSection('planner')" class="flex flex-col items-center gap-1 font-bold text-[10px]">🏠<span>الرئيسية</span></button>
         <button onclick="showSection('closet')" class="flex flex-col items-center gap-1 font-bold text-[10px]">👕<span>الدولاب</span></button>
         <button onclick="showSection('history')" class="flex flex-col items-center gap-1 font-bold text-[10px]">⏳<span>السجل</span></button>
     </nav>
 
-    <div id="uploadModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-[200] flex items-center justify-center p-6">
+    <div id="uploadModal" class="fixed inset-0 bg-black/60 backdrop-blur-md hidden z-[200] flex items-center justify-center p-6">
         <div class="bg-white dark:bg-slate-900 rounded-[40px] p-8 w-full max-w-xs text-center shadow-2xl">
             <div id="modal-ui">
-                <h3 class="text-xl font-bold mb-6 italic">رفع الملابس</h3>
+                <h3 class="text-xl font-bold mb-6 italic">إضافة ملابس</h3>
                 <div class="grid gap-3">
                     <button onclick="triggerFile('Tops')" class="w-full py-4 bg-gray-50 dark:bg-slate-800 rounded-2xl font-bold">👕 قطعة علوية</button>
                     <button onclick="triggerFile('Bottoms')" class="w-full py-4 bg-gray-50 dark:bg-slate-800 rounded-2xl font-bold">👖 قطعة سفلية</button>
                     <button onclick="triggerFile('Shoes')" class="w-full py-4 bg-gray-50 dark:bg-slate-800 rounded-2xl font-bold">👟 حذاء</button>
-                    <button onclick="closeModal()" class="mt-4 text-red-500 font-bold text-sm">إغلاق</button>
+                    <button onclick="closeModal()" class="mt-4 text-red-500 font-bold text-sm">إلغاء</button>
                 </div>
             </div>
-            <div id="loading-ui" class="hidden py-10">
-                <div class="loader-spin mx-auto mb-4"></div>
+            <div id="loading-ui" class="hidden py-10 flex flex-col items-center">
+                <div class="loader-spin mb-4"></div>
                 <p id="loading-text" class="font-bold text-sm">جاري المعالجة...</p>
             </div>
             <input type="file" id="fileInput" class="hidden" accept="image/*" multiple>
         </div>
     </div>
 
-    <div id="swapModal" class="fixed inset-0 hidden z-[300] bg-black/95 flex flex-col p-6">
-        <div class="flex justify-between items-center mb-6 text-white"><h3 class="text-xl font-black italic">اختر البديل</h3><button onclick="closeSwapModal()" class="text-3xl">&times;</button></div>
-        <div id="swap-grid" class="grid grid-cols-2 gap-4 overflow-y-auto"></div>
+    <div id="swapModal" class="fixed inset-0 hidden z-[300] bg-black/95 flex flex-col p-6 overflow-hidden">
+        <div class="flex justify-between items-center mb-8 text-white"><h3 class="text-2xl font-black italic">اختر البديل</h3><button onclick="closeSwapModal()" class="text-4xl">&times;</button></div>
+        <div id="swap-grid" class="grid grid-cols-2 gap-4 overflow-y-auto pb-20"></div>
     </div>
 
     <script>
-        const DB_KEY = 'STYLESYNC_V9_STABLE';
+        const DB_KEY = 'STYLE_SYNC_ULTRA_FINAL';
         let state = JSON.parse(localStorage.getItem(DB_KEY)) || { closet: [], history: [], dark: false };
         let activeCat = '';
         window.currentOutfit = { Tops: null, Bottoms: null, Shoes: null };
 
-        // --- نظام الرفع الآمن (تجنب التعليق) ---
+        // --- نظام الرفع السلس ---
         function triggerFile(cat) { activeCat = cat; document.getElementById('fileInput').click(); }
 
         document.getElementById('fileInput').addEventListener('change', async function(e) {
@@ -102,15 +146,12 @@
             document.getElementById('loading-ui').classList.remove('hidden');
 
             for (let i = 0; i < files.length; i++) {
-                document.getElementById('loading-text').innerText = `يتم الآن حفظ ${i+1} من ${files.length}...`;
-                // انتظار بسيط بين كل صورة لمنح المتصفح وقت للتنفس
-                await new Promise(r => setTimeout(r, 100));
+                document.getElementById('loading-text').innerText = `حفظ ${i+1} من ${files.length}...`;
+                await new Promise(r => requestAnimationFrame(r)); // يعطي المتصفح فرصة لتحديث الواجهة
                 await processImage(files[i]);
             }
 
-            save();
-            renderCloset();
-            closeModal();
+            save(); renderCloset(); closeModal();
             document.getElementById('modal-ui').classList.remove('hidden');
             document.getElementById('loading-ui').classList.add('hidden');
             e.target.value = '';
@@ -119,108 +160,105 @@
         async function processImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
-                reader.onload = (event) => {
+                reader.onload = (e) => {
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_W = 300; // تقليل الحجم لضمان السرعة القصوى
-                        const scale = MAX_W / img.width;
+                        const MAX_W = 400; 
                         canvas.width = MAX_W;
-                        canvas.height = img.height * scale;
+                        canvas.height = img.height * (MAX_W / img.width);
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        
-                        // ضغط الجودة لـ 40% (توازن مثالي بين الشكل والمساحة)
-                        const data = canvas.toDataURL('image/jpeg', 0.4);
-                        state.closet.push({ id: Date.now() + Math.random(), img: data, cat: activeCat, clean: true });
-                        
-                        // تنظيف الذاكرة يدوياً
-                        canvas.width = 0; canvas.height = 0;
+                        state.closet.push({ id: Date.now() + Math.random(), img: canvas.toDataURL('image/jpeg', 0.5), cat: activeCat, clean: true });
                         resolve();
                     };
-                    img.src = event.target.result;
+                    img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
             });
         }
 
-        // --- باقي الوظائف ---
-        function save() { try { localStorage.setItem(DB_KEY, JSON.stringify(state)); } catch(e) { alert("الذاكرة ممتلئة!"); } }
-        function toggleDarkMode() { state.dark = !state.dark; applyTheme(); save(); }
-        function applyTheme() {
-            if(state.dark) { document.body.classList.add('dark-mode'); document.getElementById('theme-icon').innerText = '☀️'; }
-            else { document.body.classList.remove('dark-mode'); document.getElementById('theme-icon').innerText = '🌙'; }
-        }
-        function showSection(id) {
-            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            if(id === 'closet') renderCloset();
-            if(id === 'history') renderHistory();
-        }
+        // --- التنسيق والتبديل ---
         function generateOutfit() {
             const get = (c) => state.closet.filter(i => i.clean && i.cat === c);
             const t = get('Tops'), b = get('Bottoms'), s = get('Shoes');
-            if(!t.length || !b.length || !s.length) return alert("أضف ملابس أولاً!");
+            if(!t.length || !b.length || !s.length) return alert("الخزانة فاضية! ارفع هدوم الأول.");
             window.currentOutfit = { Tops: t[Math.floor(Math.random()*t.length)], Bottoms: b[Math.floor(Math.random()*b.length)], Shoes: s[Math.floor(Math.random()*s.length)] };
             renderOutfitDisplay();
         }
+
         function renderOutfitDisplay() {
             document.getElementById('outfit-display').innerHTML = Object.keys(window.currentOutfit).map(k => `
-                <div onclick="openSwapModal('${k}')" class="fashion-card p-4 flex items-center gap-5 border border-blue-100 dark:border-blue-900 cursor-pointer">
-                    <img src="${window.currentOutfit[k].img}" class="w-20 h-20 object-cover rounded-2xl shadow">
-                    <div class="text-right flex-1"><p class="text-[9px] font-black text-blue-500 uppercase">${k}</p><p class="text-lg font-bold italic">تبديل القطعة</p></div>
+                <div onclick="openSwapModal('${k}')" class="fashion-card p-4 flex items-center gap-5 border-2 border-blue-50 dark:border-slate-800 clickable">
+                    <img src="${window.currentOutfit[k].img}" class="w-20 h-20 object-cover rounded-[20px] shadow-sm">
+                    <div class="text-right flex-1"><p class="text-[9px] font-black text-blue-500 uppercase tracking-widest">${k}</p><p class="text-lg font-black italic">تبديل</p></div>
                 </div>
             `).join('');
             document.getElementById('confirm-btn').classList.remove('hidden');
         }
+
         function openSwapModal(cat) {
             window.tempSwapCat = cat;
-            const grid = document.getElementById('swap-grid');
-            grid.innerHTML = state.closet.filter(i => i.clean && i.cat === cat).map(item => `
-                <div onclick="selectReplacement(${item.id})" class="fashion-card"><img src="${item.img}" class="w-full h-40 object-cover"></div>
+            document.getElementById('swap-grid').innerHTML = state.closet.filter(i => i.clean && i.cat === cat).map(item => `
+                <div onclick="selectReplacement(${item.id})" class="fashion-card clickable"><img src="${item.img}" class="w-full h-44 object-cover"></div>
             `).join('');
             document.getElementById('swapModal').classList.remove('hidden');
         }
+
         function selectReplacement(id) {
             window.currentOutfit[window.tempSwapCat] = state.closet.find(i => i.id === id);
-            renderOutfitDisplay(); document.getElementById('swapModal').classList.add('hidden');
+            renderOutfitDisplay(); closeSwapModal();
         }
+
         function closeSwapModal() { document.getElementById('swapModal').classList.add('hidden'); }
-        function confirmOutfit() {
-            Object.values(window.currentOutfit).forEach(o => { const item = state.closet.find(i => i.id === o.id); if(item) item.clean = false; });
-            state.history.push({ id: Date.now(), date: new Date().toLocaleDateString('ar-EG'), imgs: [window.currentOutfit.Tops.img, window.currentOutfit.Bottoms.img, window.currentOutfit.Shoes.img] });
-            save(); location.reload();
-        }
+
+        // --- الإدارة ---
         function renderCloset() {
             document.getElementById('closet-grid').innerHTML = state.closet.map(i => `
-                <div class="fashion-card">
+                <div class="fashion-card shadow-sm">
                     <button onclick="deleteItem(${i.id})" class="delete-btn">✕</button>
-                    <img src="${i.img}" class="w-full h-44 object-cover">
-                    <div class="p-3 flex justify-between bg-white dark:bg-slate-800">
-                        <span class="text-[9px] font-bold opacity-30">${i.cat}</span>
-                        <input type="checkbox" ${i.clean?'checked':''} onchange="toggleClean(${i.id})" class="w-5 h-5 accent-black">
+                    <img src="${i.img}" class="w-full h-48 object-cover">
+                    <div class="p-4 flex justify-between bg-white dark:bg-slate-800">
+                        <span class="text-[9px] font-black opacity-20">${i.cat}</span>
+                        <input type="checkbox" ${i.clean?'checked':''} onchange="toggleClean(${i.id})" class="w-6 h-6 accent-blue-500">
                     </div>
                 </div>
             `).join('');
         }
-        function toggleClean(id) { const i = state.closet.find(c => c.id === id); if(i) i.clean = !i.clean; save(); }
-        function deleteItem(id) { if(confirm("حذف؟")) { state.closet = state.closet.filter(i => i.id !== id); save(); renderCloset(); } }
+
         function renderHistory() {
             document.getElementById('history-list').innerHTML = state.history.slice().reverse().map(h => `
-                <div class="fashion-card p-5 border">
-                    <p class="text-[10px] opacity-30 mb-4">${h.date}</p>
-                    <div class="flex gap-2">${h.imgs.map(img => `<img src="${img}" class="w-16 h-16 object-cover rounded-xl shadow-sm">`).join('')}</div>
+                <div class="fashion-card p-6 border border-gray-100 dark:border-slate-800">
+                    <p class="text-[10px] font-bold opacity-30 mb-4">${h.date}</p>
+                    <div class="flex gap-3">${h.imgs.map(img => `<img src="${img}" class="w-16 h-16 object-cover rounded-xl shadow-sm">`).join('')}</div>
                 </div>
-            `).join('') || "<p class='text-center opacity-40 py-10'>السجل فارغ</p>";
+            `).join('') || "<p class='text-center opacity-30 py-20 italic'>السجل فاضي حالياً</p>";
         }
-        function resetSystem() { if(confirm("حذف كل شيء؟")) { localStorage.clear(); location.reload(); } }
-        function openModal() { document.getElementById('uploadModal').classList.remove('hidden'); }
-        function closeModal() { document.getElementById('uploadModal').classList.add('hidden'); }
+
+        function confirmOutfit() {
+            Object.values(window.currentOutfit).forEach(o => { const item = state.closet.find(i => i.id === o.id); if(item) item.clean = false; });
+            state.history.push({ id: Date.now(), date: new Date().toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'}), imgs: [window.currentOutfit.Tops.img, window.currentOutfit.Bottoms.img, window.currentOutfit.Shoes.img] });
+            save(); location.reload();
+        }
+
+        function save() { try { localStorage.setItem(DB_KEY, JSON.stringify(state)); } catch(e) { alert("الذاكرة ممتلئة!"); } }
+        function toggleDarkMode() { state.dark = !state.dark; applyTheme(); save(); }
+        function applyTheme() {
+            document.body.classList.toggle('dark-mode', state.dark);
+            document.getElementById('theme-icon').innerText = state.dark ? '☀️' : '🌙';
+        }
         function showSection(id) {
             document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             if(id === 'closet') renderCloset(); if(id === 'history') renderHistory();
+            window.scrollTo(0,0);
         }
+        function toggleClean(id) { const i = state.closet.find(c => c.id === id); if(i) i.clean = !i.clean; save(); }
+        function deleteItem(id) { if(confirm("حذف؟")) { state.closet = state.closet.filter(i => i.id !== id); save(); renderCloset(); } }
+        function resetSystem() { if(confirm("حذف كل شيء؟")) { localStorage.clear(); location.reload(); } }
+        function openModal() { document.getElementById('uploadModal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('uploadModal').classList.add('hidden'); }
+
         applyTheme(); showSection('planner');
     </script>
 </body>
