@@ -20,16 +20,12 @@
             overflow-x: hidden;
         }
 
-        /* تأثيرات اللمس الاحترافية */
         button, .clickable {
             transition: transform 0.1s ease, opacity 0.1s ease;
             cursor: pointer;
             touch-action: manipulation;
         }
-        button:active, .clickable:active {
-            transform: scale(0.92);
-            opacity: 0.7;
-        }
+        button:active, .clickable:active { transform: scale(0.92); opacity: 0.7; }
 
         .fashion-card { 
             background: var(--card); 
@@ -148,10 +144,39 @@
     </div>
 
     <script>
-        const DB_KEY = 'STYLE_SYNC_MASTER_FINAL';
-        let state = JSON.parse(localStorage.getItem(DB_KEY)) || { closet: [], history: [], dark: false };
+        const DB_KEY = 'STYLE_SYNC_MASTER_DATA';
+        let state = { closet: [], history: [], dark: false };
         let activeCat = '';
         window.currentOutfit = { Tops: null, Bottoms: null, Shoes: null };
+
+        // --- نظام قواعد البيانات IndexedDB لحفظ دائم ومساحة غير محدودة ---
+        const initDB = () => new Promise((resolve, reject) => {
+            const request = indexedDB.open('StyleSyncDatabase', 1);
+            request.onupgradeneeded = (e) => e.target.result.createObjectStore('appData');
+            request.onsuccess = (e) => resolve(e.target.result);
+            request.onerror = (e) => reject(e.target.error);
+        });
+
+        async function save() {
+            try {
+                const db = await initDB();
+                const tx = db.transaction('appData', 'readwrite');
+                tx.objectStore('appData').put(state, DB_KEY);
+            } catch (err) { console.error("فشل الحفظ", err); }
+        }
+
+        async function loadData() {
+            try {
+                const db = await initDB();
+                const tx = db.transaction('appData', 'readonly');
+                const req = tx.objectStore('appData').get(DB_KEY);
+                req.onsuccess = () => {
+                    if (req.result) state = req.result;
+                    applyTheme();
+                    showSection('planner');
+                };
+            } catch (err) { console.error("فشل التحميل", err); }
+        }
 
         // --- نظام الرفع المتعدد المستقر ---
         function triggerFile(cat) { activeCat = cat; document.getElementById('fileInput').click(); }
@@ -164,13 +189,14 @@
             document.getElementById('loading-ui').classList.remove('hidden');
 
             for (let i = 0; i < files.length; i++) {
-                // تم إصلاح الخطأ هنا بإضافة `
                 document.getElementById('loading-text').innerText = `يتم الحفظ (${i+1} / ${files.length})`;
                 await new Promise(r => requestAnimationFrame(r));
                 await processImage(files[i]);
             }
 
-            save(); renderCloset(); closeModal();
+            await save(); 
+            renderCloset(); 
+            closeModal();
             document.getElementById('modal-ui').classList.remove('hidden');
             document.getElementById('loading-ui').classList.add('hidden');
             e.target.value = '';
@@ -183,7 +209,7 @@
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_W = 400; // حجم مثالي للموبايل
+                        const MAX_W = 400; 
                         canvas.width = MAX_W;
                         canvas.height = img.height * (MAX_W / img.width);
                         const ctx = canvas.getContext('2d');
@@ -194,7 +220,6 @@
                             cat: activeCat, 
                             clean: true 
                         });
-                        canvas.width = 0; canvas.height = 0; // تفريغ فوري للذاكرة
                         resolve();
                     };
                     img.src = e.target.result;
@@ -218,7 +243,6 @@
         }
 
         function renderOutfitDisplay() {
-            // تم إصلاح الخطأ هنا بإضافة `
             document.getElementById('outfit-display').innerHTML = Object.keys(window.currentOutfit).map(k => `
                 <div onclick="openSwapModal('${k}')" class="fashion-card p-5 flex items-center gap-6 border-2 border-blue-50 dark:border-slate-800 clickable relative">
                     <img src="${window.currentOutfit[k].img}" class="w-24 h-24 object-cover rounded-[24px] shadow-sm">
@@ -235,7 +259,6 @@
         function openSwapModal(cat) {
             window.tempSwapCat = cat;
             const alternatives = state.closet.filter(i => i.clean && i.cat === cat);
-            // تم إصلاح الخطأ هنا بإضافة `
             document.getElementById('swap-grid').innerHTML = alternatives.map(item => `
                 <div onclick="selectReplacement(${item.id})" class="fashion-card clickable border-4 ${window.currentOutfit[cat].id === item.id ? 'border-blue-500':'border-transparent'} relative">
                     <img src="${item.img}" class="w-full h-52 object-cover">
@@ -254,7 +277,6 @@
         // --- إدارة النظام ---
         function renderCloset() {
             const grid = document.getElementById('closet-grid');
-            // تم إصلاح الخطأ هنا بإضافة `
             grid.innerHTML = state.closet.map(i => `
                 <div class="fashion-card shadow-sm relative">
                     <button onclick="deleteItem(${i.id})" class="delete-btn">✕</button>
@@ -265,14 +287,12 @@
                     </div>
                 </div>
             `).join('');            
-            // تم إصلاح الخطأ هنا بإضافة `
             document.getElementById('closet-count').innerText = `${state.closet.length} قطع`;
         }
 
         function renderHistory() {
             const list = document.getElementById('history-list');
             if(!state.history.length) return list.innerHTML = "<div class='py-20 text-center opacity-20 italic font-bold'>لا توجد سجلات بعد</div>";
-            // تم إصلاح الخطأ هنا بإضافة `
             list.innerHTML = state.history.slice().reverse().map(h => `
                 <div class="fashion-card p-6 border border-gray-100 dark:border-slate-800">
                     <p class="text-[11px] font-black opacity-30 mb-5 uppercase tracking-widest text-blue-500">${h.date}</p>
@@ -283,25 +303,23 @@
             `).join('');        
         }
 
-        function confirmOutfit() {
+        async function confirmOutfit() {
             Object.values(window.currentOutfit).forEach(o => {
                 const item = state.closet.find(i => i.id === o.id);
-                if(item) item.clean = false; // يتم تحويل حالة القطعة إلى "غير نظيفة"
+                if(item) item.clean = false;
             });
-            // يتم حفظ الصورة نفسها بشكل مستقل في السجل كما طلبت
             state.history.push({
                 id: Date.now(),
                 date: new Date().toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'}),
                 imgs: [window.currentOutfit.Tops.img, window.currentOutfit.Bottoms.img, window.currentOutfit.Shoes.img]
             });
-            save(); 
+            await save(); 
             alert("تم حفظ الطقم في السجل وتحديث حالة الملابس!");
-            showSection('history'); // الانتقال التلقائي للسجل بعد الحفظ
+            showSection('history');
         }
 
         // --- الأساسيات ---
-        function save() { try { localStorage.setItem(DB_KEY, JSON.stringify(state)); } catch(e) { alert("تنبيه: مساحة التخزين في المتصفح ممتلئة! يرجى حذف بعض القطع القديمة."); } }
-        function toggleDarkMode() { state.dark = !state.dark; applyTheme(); save(); }
+        async function toggleDarkMode() { state.dark = !state.dark; applyTheme(); await save(); }
         function applyTheme() {
             document.body.classList.toggle('dark-mode', state.dark);
             document.getElementById('theme-icon').innerText = state.dark ? '☀️' : '🌙';
@@ -313,15 +331,21 @@
             if(id === 'history') renderHistory();
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
-        function toggleClean(id) { const i = state.closet.find(c => c.id === id); if(i) i.clean = !i.clean; save(); }
-        function deleteItem(id) { if(confirm("هل تريد حذف هذه القطعة نهائياً؟")) { state.closet = state.closet.filter(i => i.id !== id); save(); renderCloset(); } }
-        function resetSystem() { if(confirm("سيتم مسح كل الملابس والسجلات! هل أنت متأكد؟")) { localStorage.removeItem(DB_KEY); location.reload(); } }
+        async function toggleClean(id) { const i = state.closet.find(c => c.id === id); if(i) { i.clean = !i.clean; await save(); } }
+        async function deleteItem(id) { if(confirm("هل تريد حذف هذه القطعة نهائياً؟")) { state.closet = state.closet.filter(i => i.id !== id); await save(); renderCloset(); } }
+        async function resetSystem() { 
+            if(confirm("سيتم مسح كل الملابس والسجلات! هل أنت متأكد؟")) { 
+                const db = await initDB();
+                const tx = db.transaction('appData', 'readwrite');
+                tx.objectStore('appData').clear();
+                location.reload(); 
+            } 
+        }
         function openModal() { document.getElementById('uploadModal').classList.remove('hidden'); }
         function closeModal() { document.getElementById('uploadModal').classList.add('hidden'); }
 
-        // تهيئة التطبيق
-        applyTheme();
-        showSection('planner');
+        // تحميل البيانات فور فتح الموقع
+        loadData();
     </script>
 </body>
 </html>
